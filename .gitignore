@@ -7,3 +7,4 @@ ocr/
 event_leads.csv
 runs/
 *.log
+README.md
