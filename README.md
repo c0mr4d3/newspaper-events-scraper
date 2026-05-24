@@ -144,24 +144,6 @@ The system generally ignores:
 
 ---
 
-## Current Scope
-
-This is an MVP.
-
-Current focus:
-
-```text
-Downloaded epaper pages → OCR → Event rows → CSV
-```
-
-No CRM.  
-No lead scoring.  
-No contact discovery.  
-No automatic outreach.  
-No complex deduplication.
-
-Manual review is expected after extraction.
-
 ---
 
 ## Intended Use
