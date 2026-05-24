@@ -144,25 +144,7 @@ The system generally ignores:
 
 ---
 
-## Current Scope
 
-This is an MVP.
-
-Current focus:
-
-```text
-Downloaded epaper pages → OCR → Event rows → CSV
-```
-
-No CRM.  
-No lead scoring.  
-No contact discovery.  
-No automatic outreach.  
-No complex deduplication.
-
-Manual review is expected after extraction.
-
----
 
 ## Intended Use
 
@@ -188,19 +170,7 @@ The extracted database helps identify these opportunities early.
 
 ---
 
-## Notes
 
-This project is meant for internal business research using legitimately accessed/downloaded epaper pages.
-
-It extracts only limited factual event information and is not meant to republish newspaper articles or create a public archive of newspaper content.
-
----
-
-## Project Status
-
-MVP / Proof of Concept
-
-Main goal:
 
 ```text
 Convert local Hindi epaper pages into a simple event lead database.
