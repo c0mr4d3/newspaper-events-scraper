@@ -1,0 +1,20 @@
+{
+  "name": "dainik-bhaskar-epaper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "login": "node src/login.js",
+    "run-job": "node src/runJob.js",
+    "scrape": "node src/download.js",
+    "download": "node src/download.js",
+    "download:headless": "node src/download.js --headless",
+    "ocr": "node src/ocr.js",
+    "extract-events": "node src/extractEvents.js",
+    "leads": "node src/leads.js",
+    "debug": "node src/download.js --headed --dry-run --max-pages 3"
+  },
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "source": "dainik_bhaskar",
+  "date_start": "2026-05-13",
+  "date_end": "2026-05-13",
+  "max_pages_per_edition_date": 40,
+  "stop_after_invalid_pages": 2,
+  "minimum_file_size_bytes": 50000,
+  "delay_between_pages_seconds": 0,
+  "concurrency": 10,
+  "profile_dir": ".browser-profile",
+  "download_root": "downloads",
+  "status_csv_path": "scrape-status.csv",
+  "manifest_path": "manifest.jsonl",
+  "ocr_root": "ocr",
+  "ocr_lang": "hin+eng",
+  "ocr_psm": 6,
+  "ocr_dpi": 300,
+  "ocr_concurrency": 4,
+  "event_leads_path": "event_leads.csv",
+  "editions": [
+    {
+      "city": "Raipur",
+      "edition_name": "Dainik Bhaskar Raipur",
+      "slug": "raipur",
+      "edition_id": 116,
+      "enabled": true
+    },
+    {
+      "city": "Raipur",
+      "edition_name": "DB Star Raipur",
+      "slug": "raipur-db-star",
+      "edition_id": 190,
+      "enabled": false
+    }
+  ]
+}

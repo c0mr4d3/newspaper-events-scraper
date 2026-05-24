@@ -1,177 +1,128 @@
-# Local Newspaper Event Lead Extractor
+# Dainik Bhaskar Epaper Downloader
 
-This project turns local Hindi epaper pages into a simple business lead database.
+Local Playwright downloader for authenticated Dainik Bhaskar epaper pages.
 
-It is built for businesses that sell trophies, mementos, awards, plaques, souvenirs, certificates, shawls, and corporate gifts.
+## Setup
 
-The core idea:
-
-> Local newspapers report events.  
-> Events often need awards and mementos.  
-> Events often repeat every year.  
-> So old newspaper event data can become future sales leads.
-
----
-
-## What It Does
-
-The system processes downloaded Dainik Bhaskar epaper pages and extracts event-related leads.
-
-Final output:
-
-```csv
-city,date,org_name,event_topic
+```bash
+npm install
+cp config.example.json config.json
 ```
 
-Example:
+Edit `config.json`, then authenticate once:
 
-```csv
-Raipur,2026-05-13,अग्रवाल समाज,प्रतिभा सम्मान समारोह
-Raipur,2026-05-13,कृष्णा पब्लिक स्कूल,वार्षिकोत्सव एवं पुरस्कार वितरण
-Raipur,2026-05-13,भारतीय स्टेट बैंक,उत्कृष्ट कर्मचारियों का सम्मान
-Raipur,2026-05-13,XYZ TMT,डीलर मीट और पुरस्कार वितरण
+```bash
+npm run login
 ```
 
----
+A normal browser window opens with a persistent profile stored in `.browser-profile/`. Log in to Bhaskar there, visit any paid epaper page if needed, then press Enter in the terminal to close the browser.
 
-## Why This Is Useful
+Run the downloader:
 
-Instead of finding random organisations, this finds organisations that have already conducted events.
+```bash
+npm run scrape -- --config config.json
+```
 
-Useful event types include:
+The default download mode is headed because Bhaskar currently returns `403` to Playwright's headless Chromium in this environment. You can still try headless with:
 
-- Award ceremonies
-- Felicitation programs
-- School/college annual functions
-- Prize distributions
-- Dealer meets
-- Employee recognition events
-- Foundation days
-- Sports competitions
-- Community/samaj events
-- Government or PSU events
+```bash
+npm run download:headless -- --config config.json
+```
 
-These can become future leads for mementos, trophies, and gifting products.
+Useful debug run:
 
----
+```bash
+npm run debug -- --config config.json
+```
 
-## How It Works
+## Output
 
-1. Download epaper pages for selected cities and dates.
-2. OCR/read the Hindi newspaper pages.
-3. Look for event-related news items.
-4. Extract only the useful details.
-5. Save everything into a simple CSV.
+Files are saved as:
 
----
+```text
+downloads/{slug}/{date}/{slug}_{date}_page_{page_number}.jpeg
+```
 
-## Output Format
+`manifest.jsonl` records every saved, skipped, invalid, and failed page so interrupted runs are easier to inspect.
 
-The output file is:
+`scrape-status.csv` records one row per `source + slug + edition_id + date` combination. Reruns skip rows marked `completed`; use `--force` when you intentionally want to scrape a completed combination again.
+
+Tune speed with `concurrency` and `delay_between_pages_seconds` in `config.json`. The downloader reuses a fixed number of tabs equal to `concurrency`.
+
+## Resume Behavior
+
+```bash
+npm run scrape -- --config config.json
+```
+
+The script runs all enabled editions for every date in `date_start..date_end`. Each combo is marked `running`, then `completed`, `partial`, or `failed` in `scrape-status.csv`.
+
+Force a rerun of completed combos:
+
+```bash
+npm run scrape -- --config config.json --force
+```
+
+## Agent Runner
+
+Use the orchestrator when you want to issue a city/date job and let stage agents run in order:
+
+```bash
+npm run run-job -- --city Raipur --date-start 2026-05-13 --date-end 2026-05-13
+```
+
+The orchestrator writes a per-run config and status under:
+
+```text
+runs/{run_id}/
+```
+
+It runs:
+
+```text
+scrape-agent -> ocr-agent -> event-extraction-agent
+```
+
+Agent specs live in:
+
+```text
+agents/
+```
+
+You can target a specific edition instead:
+
+```bash
+npm run run-job -- --slug raipur --edition-id 116 --date-start 2026-05-13 --date-end 2026-05-20
+```
+
+## Event Leads
+
+OCR downloaded pages and extract possible trophy/memento/corporate-gifting event leads:
+
+```bash
+npm run leads -- --config config.json
+```
+
+This writes:
 
 ```text
 event_leads.csv
 ```
 
-Columns:
+with exactly:
 
-```csv
+```text
 city,date,org_name,event_topic
 ```
 
-Example table:
+OCR text is cached under `ocr/{slug}/{date}/`. Use `--force` to OCR pages again:
 
-| city | date | org_name | event_topic |
-|---|---|---|---|
-| Raipur | 2026-05-13 | अग्रवाल समाज | प्रतिभा सम्मान समारोह |
-| Raipur | 2026-05-13 | कृष्णा पब्लिक स्कूल | वार्षिकोत्सव एवं पुरस्कार वितरण |
-| Raipur | 2026-05-13 | भारतीय स्टेट बैंक | उत्कृष्ट कर्मचारियों का सम्मान |
-
----
-
-## What It Looks For
-
-Hindi event keywords such as:
-
-```text
-कार्यक्रम
-आयोजन
-समारोह
-सम्मान
-पुरस्कार
-वार्षिकोत्सव
-स्थापना दिवस
-प्रतिभा सम्मान
-पुरस्कार वितरण
-ट्रॉफी
-शील्ड
-स्मृति चिन्ह
-प्रशस्ति पत्र
+```bash
+npm run leads -- --config config.json --force
 ```
 
-Organisation clues such as:
+## Notes
 
-```text
-स्कूल
-कॉलेज
-बैंक
-संस्था
-समाज
-संघ
-क्लब
-ट्रस्ट
-कंपनी
-उद्योग
-विभाग
-चेंबर
-एसोसिएशन
-```
-
----
-
-## What It Ignores
-
-The system generally ignores:
-
-- Crime reports
-- Accidents
-- Political allegations
-- Protests
-- Routine civic complaints
-- Police/court cases
-- Weather reports
-- News with no event or award angle
-
----
-
-
-
-## Intended Use
-
-After generating the CSV:
-
-1. Review and clean the leads.
-2. Identify strong event opportunities.
-3. Find organisation contact details.
-4. Approach them before their next likely event cycle.
-5. Pitch trophies, mementos, awards, plaques, or custom gifts.
-
----
-
-## Example Business Use
-
-If a school had a prize distribution event in August last year, it may conduct a similar event again this year.
-
-If a company held a dealer meet in September, it may need trophies, plaques, or mementos again around the same period.
-
-If a samaj or association organised a talent felicitation ceremony, they may require customised awards or gifts for the next edition of the event.
-
-The extracted database helps identify these opportunities early.
-
----
-
-
-
-```text
-Convert local Hindi epaper pages into a simple event lead database.
-```
+- `pid` starts at `0`; output page numbering starts at `001` by default.
+- The downloader first discovers valid pids from the edition's page navigation. If that fails, it falls back to sequential probing and stops after `stop_after_invalid_pages` consecutive invalid pages.
+- The scraper first tries to extract the rendered large DOM image and encode it as JPEG. If that fails, it tries direct image responses, then a likely download control.

@@ -1,0 +1,9 @@
+node_modules/
+.browser-profile/
+downloads/
+manifest.jsonl
+scrape-status.csv
+ocr/
+event_leads.csv
+runs/
+*.log
